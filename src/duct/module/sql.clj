@@ -14,10 +14,11 @@
    :test        :rebase
    :development :rebase})
 
-(defn- database-config [jdbc-url]
+(defn- database-config [jdbc-url {:keys [level] :or {level :info}}]
   {:duct.database.sql/hikaricp
    ^:demote {:jdbc-url jdbc-url
-             :logger   (ig/ref :duct/logger)}})
+             :logger   (ig/ref :duct/logger)
+             :level    level}})
 
 (defn- migrator-config [environment]
   {:duct.migrator/ragtime
@@ -33,5 +34,5 @@
   (fn [config]
     (core/merge-configs
      config
-     (database-config (:database-url options default-database-url))
+     (database-config (:database-url options default-database-url) options)
      (migrator-config (get-environment config options)))))
